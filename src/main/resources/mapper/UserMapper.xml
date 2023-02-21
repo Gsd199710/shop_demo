@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace属性：指定当前文件与哪个接口进行映射，需要指定的完整接口路径-->
+<mapper namespace="com.demo.shop.mapper.UserMapper">
+<!-- resultMap自定义映射规则：注意主键是不可以省略的
+        id:映射分配的唯一id，值为使用这一规则的属性对应的值
+        type:值为要使用该映射规则的数据库所对应的类
+        column:表中的字段
+        property:对应类的属性
+ -->
+    <resultMap id="UserEntityMap" type="com.demo.shop.entity.User">
+        <id column="uid" property="uid"></id>
+        <result column="is_delete" property="isDelete"></result>
+        <result column="created_user" property="createdUser"></result>
+        <result column="created_time" property="createdTime"></result>
+        <result column="modified_user" property="modifiedUser"></result>
+        <result column="modified_time" property="modifiedTime"></result>
+    </resultMap>
+<!-- useGeneratedKeys属性：开启某字段的主键自增，keyProperty属性：指出需要主键自增的字段  -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="uid">
+        INSERT INTO t_user
+            (username,password,salt,phone,email,gender,avatar,is_delete,created_user,created_time,modified_user,modified_time)
+        VALUES
+            (#{username},#{password},#{salt},#{phone},#{email},#{gender},#{avatar},#{isDelete},#{createdUser},#{createdTime},#{modifiedUser},#{modifiedTime})
+    </insert>
+<!--  select查询的结果可能是一个或多个对象，如果是多个对象且查询的结果集类型与所映射的类一致，可以使用
+      resultType指向所映射的包路径；不一致则可用resultMap来自定义查询结果集的映射规则
+ -->
+    <select id="findByUsername" resultMap="UserEntityMap">
+        SELECT * FROM t_user WHERE username = #{username}
+    </select>
+    <update id="updatePasswordByUid">
+        UPDATE t_user SET
+                password =#{password},
+                modified_user =#{modifiedUser},
+                modified_time =#{modifiedTime}
+        WHERE uid =#{uid}
+    </update>
+    <select id="findByUid" resultMap="UserEntityMap">
+        SELECT * FROM t_user WHERE uid=#{uid}
+    </select>
+    <!-- if标签，mybatis自带的条件判断标签，test的值为true时执行标签内的语句-->
+    <update id="updateInfoByUid">
+        UPDATE t_user
+        SET <if test="phone!= null">phone = #{phone},</if>
+            <if test="email!=null">email = #{email},</if>
+            <if test="gender!=null">gender = #{gender},</if>
+            modified_user = #{modifiedUser},
+            modified_time = #{modifiedTime}
+        WHERE uid = #{uid}
+    </update>
+    <update id="updateAvatarByUid">
+        UPDATE t_user
+        SET avatar = #{avatar},
+            modified_user = #{modifiedUser},
+            modified_time = #{modifiedTime}
+        WHERE uid = #{uid}
+    </update>
+</mapper>
