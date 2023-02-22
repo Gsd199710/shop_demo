@@ -4,6 +4,7 @@ import com.demo.shop.entity.Address;
 import com.demo.shop.service.IAddressService;
 import com.demo.shop.util.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,5 +28,14 @@ public class AddressController extends BaseController{
         Integer uid = getuidFromSession(session);
         List<Address> data = addressService.findByUid(uid);
         return new JsonResult<>(OK,data);
+    }
+    @RequestMapping("/set_default/{aid}")
+    public JsonResult<Void> setDefault(@PathVariable("aid")Integer aid,
+                                       HttpSession session){
+        addressService.setDefault(
+                getuidFromSession(session),
+                aid,
+                getUsernameFromSession(session));
+        return new JsonResult<>(OK);
     }
 }

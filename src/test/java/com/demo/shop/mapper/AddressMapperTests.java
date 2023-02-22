@@ -36,4 +36,27 @@ public class AddressMapperTests {
         List<Address> list = addressMapper.findByUid(10);
         list.forEach(System.out::println);
     }
+    @Test
+    public void findByAid(){
+        Address address = addressMapper.findByAid(14);
+        System.out.println(address);
+    }
+    @Test
+    public void updateNonDefault(){
+        Integer rows = addressMapper.updateNonDefault(10);
+        System.out.println(rows);
+    }
+    @Test
+    public void updateDefaultByAid(){
+        addressMapper.updateDefaultByAid(14, "王菲", new Date());
+    }
+    @Test
+    public void deleteByAid(){
+        addressMapper.deleteByAid(12);
+    }
+    @Test
+    public void findLastModified(){
+        Address lastModified = addressMapper.findLastModified(10);
+        System.out.println(lastModified);
+    }
 }

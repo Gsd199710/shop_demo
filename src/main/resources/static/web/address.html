@@ -312,12 +312,13 @@
 
 			function setDefault(aid) {
 				$.ajax({
-					url: "/addresses/" + aid + "/set_default",
+					url: "/addresses/set_default/"+aid,
 					type: "POST",
 					dataType: "JSON",
 					success: function(json) {
 						if (json.state == 101) {
 							showAddressList();
+							alert("设置成功！")
 						} else {
 							alert("设置默认收货地址失败！" + json.message);
 						}
@@ -328,10 +329,9 @@
 					}
 				});
 			}
-
 			function deleteByAid(aid) {
 				$.ajax({
-					url: "/addresses/" + aid + "/delete",
+					url: "/addresses/delete/"+ aid ,
 					type: "POST",
 					dataType: "JSON",
 					success: function(json) {

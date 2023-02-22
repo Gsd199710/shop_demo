@@ -22,4 +22,12 @@ public class AddressServiceTests {
         address.setPhone("132356677");
         addressService.addNewAddress(1002,"xiaoming",address);
     }
+    @Test
+    public void setDefault(){
+        addressService.setDefault(10,16,"马冬梅");
+    }
+    @Test
+    public void delete(){
+
+    }
 }

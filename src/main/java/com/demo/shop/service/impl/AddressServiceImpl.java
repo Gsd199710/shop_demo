@@ -1,11 +1,15 @@
 package com.demo.shop.service.impl;
 
 import com.demo.shop.controller.ex.AddressCountLimitedEXception;
+import com.demo.shop.controller.ex.DeleteException;
 import com.demo.shop.entity.Address;
 import com.demo.shop.mapper.AddressMapper;
 import com.demo.shop.service.IAddressService;
 import com.demo.shop.service.IDistrictService;
+import com.demo.shop.service.ex.AccessDeniedException;
+import com.demo.shop.service.ex.AddressNotFoundException;
 import com.demo.shop.service.ex.InsertException;
+import com.demo.shop.service.ex.UpdateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -59,8 +63,8 @@ public class AddressServiceImpl implements IAddressService {
     public List<Address> findByUid(Integer uid) {
         List<Address> list = addressMapper.findByUid(uid);
         list.stream().map(e->{
-            e.setAid(null);
-            e.setUid(null);
+//            e.setAid(null);
+//            e.setUid(null);
             e.setProvinceCode(null);
             e.setCityCode(null);
             e.setAreaCode(null);
@@ -73,5 +77,58 @@ public class AddressServiceImpl implements IAddressService {
             return e;
         }).collect(Collectors.toList());
         return list;
+    }
+
+    @Override
+    public void setDefault(Integer uid, Integer aid, String username) {
+        Address result = addressMapper.findByAid(aid);
+        //判断用户地址是否存在
+        if (result == null) {
+            throw new AddressNotFoundException("该用户地址不存在！");
+        }
+        //判断该数据是否为当前用户所属
+        if (!result.getUid().equals(uid)){
+            throw new AccessDeniedException("非法访问！");
+        }
+        //将用户所有地址修改为非默认
+        Integer rows = addressMapper.updateNonDefault(uid);
+        if (rows < 1) {
+            throw new UpdateException("数据更新出现异常！");
+        }
+        //将指定aid的用户地址修改为默认
+        Integer update = addressMapper.updateDefaultByAid(aid, username, new Date());
+        if (update != 1) {
+            throw new UpdateException("数据更新出现异常!");
+        }
+    }
+
+    @Override
+    public void delete(Integer uid, Integer aid, String username) {
+        Address result = addressMapper.findByAid(aid);
+        if (result == null) {
+            throw new AddressNotFoundException("该地址不存在！");
+        }
+        if (!result.getUid().equals(uid)){
+            throw new AccessDeniedException("非法访问！");
+        }
+        //查询用户地址条数并进行删除操作，如果数据条数大于一条且删掉了默认地址则就要修改新的默认地址
+        Integer count = addressMapper.countByUid(uid);
+        if (count == 0) {
+            return;
+        }
+        //判断删除的是否是默认地址
+        Integer isDefault = result.getIsDefault();
+        if (count != 1 && isDefault==1) {
+            Address address = addressMapper.findLastModified(uid);
+            Integer updateDefault = addressMapper.updateDefaultByAid(address.getAid(), username, new Date());
+            if (updateDefault != 1) {
+                throw new UpdateException("修改数据出现未知异常！");
+            }
+        }
+        //删除
+        Integer delete = addressMapper.deleteByAid(aid);
+        if (delete != 1) {
+            throw new DeleteException("删除出现未知错误");
+        }
     }
 }

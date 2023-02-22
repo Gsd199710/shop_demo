@@ -29,6 +29,12 @@ public class BaseController {
         }else if (e instanceof AddressCountLimitedEXception) {
             result.setState(4006);
             result.setMessage("用户地址数量超出上限！");
+        }else if (e instanceof AccessDeniedException) {
+            result.setState(4007);
+            result.setMessage("非法访问用户数据！");
+        }else if (e instanceof AddressNotFoundException) {
+            result.setState(4008);
+            result.setMessage("用户地址不存在！");
         }else if (e instanceof InsertException) {
             result.setState(5000);
             result.setMessage("用户名注册出现未知错误！");
