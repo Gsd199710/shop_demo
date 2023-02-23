@@ -28,6 +28,11 @@ public class AddressServiceTests {
     }
     @Test
     public void delete(){
-
+        addressService.delete(10,24,"管理员");
+    }
+    @Test
+    public void getIsDefault(){
+        int isDefault = addressService.getIsDefault(19);
+        System.out.println(isDefault);
     }
 }

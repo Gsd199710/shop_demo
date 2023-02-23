@@ -65,4 +65,5 @@ public interface AddressMapper {
      * @return 收货地址数据
      */
     Address findLastModified(Integer uid);
+    Integer getIsDefaultByAid(Integer aid);
 }

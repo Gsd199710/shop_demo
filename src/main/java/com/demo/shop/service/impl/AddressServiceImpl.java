@@ -113,22 +113,31 @@ public class AddressServiceImpl implements IAddressService {
         }
         //查询用户地址条数并进行删除操作，如果数据条数大于一条且删掉了默认地址则就要修改新的默认地址
         Integer count = addressMapper.countByUid(uid);
+//        System.out.println(count);5
+        //地址数至少一个
         if (count == 0) {
             return;
         }
+        //获取当前地址的默认值
+        int isDefault = getIsDefault(aid);
         //删除
         Integer delete = addressMapper.deleteByAid(aid);
         if (delete != 1) {
             throw new DeleteException("删除出现未知错误");
         }
         //判断删除的是否是默认地址
-        Integer isDefault = result.getIsDefault();
-        if (count != 1 && isDefault==1) {
-            Address address = addressMapper.findLastModified(uid);
-            Integer updateDefault = addressMapper.updateDefaultByAid(address.getAid(), username, new Date());
-            if (updateDefault != 1) {
-                throw new UpdateException("修改数据出现未知异常！");
-            }
+        if ("0".equals(isDefault)) {
+            return;
         }
+        Address lastaddress = addressMapper.findLastModified(uid);
+        Integer updateDefault = addressMapper.updateDefaultByAid(lastaddress.getAid(), username, new Date());
+        if (updateDefault != 1) {
+            throw new UpdateException("修改数据出现未知异常！");
+        }
+    }
+
+    @Override
+    public int getIsDefault(Integer aid) {
+        return addressMapper.getIsDefaultByAid(aid);
     }
 }

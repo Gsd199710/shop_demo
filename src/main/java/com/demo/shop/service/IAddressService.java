@@ -26,4 +26,6 @@ public interface IAddressService {
      * @param username 修改人
      */
     void delete(Integer uid,Integer aid,String username);
+//    Address getByAid(Integer uid,Integer aid);
+    int getIsDefault(Integer aid);
 }

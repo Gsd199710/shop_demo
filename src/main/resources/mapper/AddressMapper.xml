@@ -57,4 +57,8 @@
         SELECT * from t_address WHERE uid=#{uid}
         ORDER BY modified_time DESC LIMIT 0,1
     </select>
+    <select id="getIsDefaultByAid" resultType="java.lang.Integer">
+        SELECT is_default FROM t_address
+        WHERE aid=#{aid}
+    </select>
 </mapper>
