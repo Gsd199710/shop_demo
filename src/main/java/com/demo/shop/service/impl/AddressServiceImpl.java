@@ -116,6 +116,11 @@ public class AddressServiceImpl implements IAddressService {
         if (count == 0) {
             return;
         }
+        //删除
+        Integer delete = addressMapper.deleteByAid(aid);
+        if (delete != 1) {
+            throw new DeleteException("删除出现未知错误");
+        }
         //判断删除的是否是默认地址
         Integer isDefault = result.getIsDefault();
         if (count != 1 && isDefault==1) {
@@ -125,10 +130,6 @@ public class AddressServiceImpl implements IAddressService {
                 throw new UpdateException("修改数据出现未知异常！");
             }
         }
-        //删除
-        Integer delete = addressMapper.deleteByAid(aid);
-        if (delete != 1) {
-            throw new DeleteException("删除出现未知错误");
-        }
+
     }
 }
