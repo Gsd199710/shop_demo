@@ -23,6 +23,8 @@
 		<link rel="stylesheet" type="text/css" href="../css/imgmove.css" />
 		<script src="../js/product.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../js/imgmove.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" src="../js/jquery-getUrlParam.js"></script>
+
 	</head>
 
 	<body>
@@ -295,17 +297,16 @@
 			</div>
 		</footer>
 		<!--页脚结束-->
-		<script type="text/javascript" src="../js/jquery-getUrlParam.js"></script>
 		<script type="text/javascript">
 			let id = $.getUrlParam("id");
 			console.log("id=" + id);
 			$(document).ready(function() {
 				$.ajax({
-					url: "/products/" + id + "/details",
+					url: "/products/details/"+id,
 					type: "GET",
 					dataType: "JSON",
 					success: function(json) {
-						if (json.state == 200) {
+						if (json.state == 101) {
 							console.log("title=" + json.data.title);
 							$("#product-title").html(json.data.title);
 							$("#product-sell-point").html(json.data.sellPoint);
@@ -315,7 +316,7 @@
 								$("#product-image-" + i + "-big").attr("src", ".." + json.data.image + i + "_big.png");
 								$("#product-image-" + i).attr("src", ".." + json.data.image + i + ".jpg");
 							}
-						} else if (json.state == 4006) { // 商品数据不存在的异常
+						} else if (json.state == 5002) { // 商品数据不存在的异常
 							location.href = "index.html";
 						} else {
 							alert("获取商品信息失败！" + json.message);
@@ -323,7 +324,7 @@
 					}
 				});
 			});
-
+			//购物车功能
 			$("#btn-add-to-cart").click(function() {
 				$.ajax({
 					url: "/carts/add_to_cart",
@@ -334,7 +335,7 @@
 					},
 					dataType: "JSON",
 					success: function(json) {
-						if (json.state == 200) {
+						if (json.state == 101) {
 							alert("增加成功！");
 						} else {
 							alert("增加失败！" + json.message);

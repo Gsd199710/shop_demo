@@ -35,12 +35,18 @@ public class BaseController {
         }else if (e instanceof AddressNotFoundException) {
             result.setState(4008);
             result.setMessage("用户地址不存在！");
+        }else if (e instanceof DeleteException) {
+            result.setState(4009);
+            result.setMessage("用户地址不存在！");
         }else if (e instanceof InsertException) {
             result.setState(5000);
             result.setMessage("用户名注册出现未知错误！");
         }else if (e instanceof UpdateException) {
             result.setState(5001);
             result.setMessage("用户数据更新出现未知错误！");
+        }else if (e instanceof ProductNotFoundException) {
+            result.setState(5002);
+            result.setMessage("该商品不存在！");
         }else if (e instanceof FileUploadIOException) {
             result.setState(6001);
             result.setMessage("文件上传过程出现错误！");
