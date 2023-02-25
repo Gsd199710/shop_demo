@@ -47,6 +47,9 @@ public class BaseController {
         }else if (e instanceof ProductNotFoundException) {
             result.setState(5002);
             result.setMessage("该商品不存在！");
+        }else if (e instanceof CartNotFountException) {
+            result.setState(5003);
+            result.setMessage("购物车数据不存在！");
         }else if (e instanceof FileUploadIOException) {
             result.setState(6001);
             result.setMessage("文件上传过程出现错误！");

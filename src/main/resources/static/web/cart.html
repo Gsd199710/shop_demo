@@ -20,7 +20,7 @@
 		<link rel="stylesheet" type="text/css" href="../css/top.css" />
 		<link rel="stylesheet" type="text/css" href="../css/footer.css" />
 		<link rel="stylesheet" type="text/css" href="../css/cart.css" />
-		<!-- <script src="../js/cart.js" type="text/javascript" charset="utf-8"></script> -->
+<!--		 <script src="../js/cart.js" type="text/javascript" charset="utf-8"></script>-->
 	</head>
 
 	<body>
@@ -174,7 +174,7 @@
 							</div>
 							<div>
 								<span class="pull-right">
-								<input type="submit" value="  结  算  " class="btn btn-primary btn-lg link-account" />
+								<input type="button" value="  结  算  " class="btn btn-primary btn-lg link-account" />
 							</span>
 							</div>
 						</form>
@@ -271,8 +271,9 @@
 			$(document).ready(function() {
 				showCartList();
 			});
-
+			//展示购物车列表
 			function showCartList() {
+				//清空tbody的内容
 				$("#cart-list").empty();
 				$.ajax({
 					url: "/carts",
@@ -287,11 +288,12 @@
 										+ '</td>'
 										+ '<td><img src="..#{image}collect.png" class="img-responsive" /></td>'
 										+ '<td>#{title}#{msg}</td>'
-										+ '<td>¥<span id="price-#{cid}">#{realPrice}</span></td>'
+										+ '<td>¥<span id="goodsprice#{cid}">#{price}</span></td>'
+										// + '<td>¥<span id="goodsPrice">#{realPrice}</span></td>'
 										+ '<td>'
-										+ 	'<input type="button" value="-" class="num-btn" onclick="reduceNum(1)" />'
-										+ 	'<input id="num-#{cid}" type="text" size="2" readonly="readonly" class="num-text" value="#{num}">'
-										+ 	'<input class="num-btn" type="button" value="+" onclick="addNum(#{cid})" />'
+										+ 	'<input id="price-#{cid}" type="button" value="-" class="num-btn" onclick="reduceNum(#{cid})" />'
+										+ 	'<input id="goodsCount#{cid}" type="text" size="2" readonly="readonly" class="num-text" value="#{num}">'
+										+ 	'<input id="price+#{cid}" class="num-btn" type="button" value="+" onclick="addNum(#{cid})" />'
 										+ '</td>'
 										+ '<td>¥<span id="total-price-#{cid}">#{totalPrice}</span></td>'
 										+ '<td>'
@@ -300,10 +302,11 @@
 									 + '</tr>';
 							tr = tr.replace(/#{cid}/g, list[i].cid);
 							tr = tr.replace(/#{title}/g, list[i].title);
+							tr = tr.replace(/#{price}/g, list[i].price);
 							tr = tr.replace(/#{image}/g, list[i].image);
 							tr = tr.replace(/#{realPrice}/g, list[i].realPrice);
 							tr = tr.replace(/#{num}/g, list[i].num);
-							tr = tr.replace(/#{totalPrice}/g, list[i].realPrice * list[i].num);
+							tr = tr.replace(/#{totalPrice}/g, list[i].price * list[i].num);
 
 							if (list[i].realPrice < list[i].price) {
 								tr = tr.replace(/#{msg}/g, "比加入时降价" + (list[i].price - list[i].realPrice) + "元");
@@ -318,14 +321,14 @@
 
 			function addNum(cid) {
 				$.ajax({
-					url: "/carts/" + cid + "/num/add",
+					url: "/carts/num/add/"+cid,
 					type: "POST",
 					dataType: "JSON",
 					success: function(json) {
-						if (json.state == 200) {
+						if (json.state == 101) {
 							// showCartList();
-							$("#num-" + cid).val(json.data);
-							let price = $("#price-" + cid).html();
+							$("#goodsCount" + cid).val(json.data);
+							let price = $("#goodsprice" + cid).html();
 							let totalPrice = price * json.data;
 							$("#total-price-" + cid).html(totalPrice);
 						} else {
@@ -338,7 +341,28 @@
 					}
 				});
 			}
-
+			function reduceNum(cid) {
+				$.ajax({
+					url: "/carts/num/reduce/"+cid,
+					type: "POST",
+					dataType: "JSON",
+					success: function(json) {
+						if (json.state == 101) {
+							// showCartList();
+							$("#goodsCount" + cid).val(json.data);
+							let price = $("#goodsprice" + cid).html();
+							let totalPrice = price * json.data;
+							$("#total-price-" + cid).html(totalPrice);
+						} else {
+							alert("减少商品数量失败！" + json.message);
+						}
+					},
+					error: function(xhr) {
+						alert("您的登录信息已经过期，请重新登录！HTTP响应码：" + xhr.status);
+						location.href = "login.html";
+					}
+				});
+			}
 			/*
 			$(function() {
 				//返回链接

@@ -1,8 +1,10 @@
 package com.demo.shop.mapper;
 
+import com.demo.shop.vo.CartVo;
 import com.demo.shop.entity.Cart;
 
 import java.util.Date;
+import java.util.List;
 
 public interface CartMapper {
     /**
@@ -32,4 +34,9 @@ public interface CartMapper {
                             Integer num,
                             String modifiedUser,
                             Date modifiedTime);
+    List<CartVo> findVOByUid(Integer uid);
+
+    Cart findByCid(Integer cid);
+
+    List<CartVo> findVOByCid(Integer[] cids);
 }

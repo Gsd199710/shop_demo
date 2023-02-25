@@ -5,12 +5,17 @@ import com.demo.shop.entity.Product;
 import com.demo.shop.mapper.CartMapper;
 import com.demo.shop.mapper.ProductMapper;
 import com.demo.shop.service.ICartService;
+import com.demo.shop.service.ex.AccessDeniedException;
+import com.demo.shop.service.ex.CartNotFountException;
 import com.demo.shop.service.ex.InsertException;
 import com.demo.shop.service.ex.UpdateException;
+import com.demo.shop.vo.CartVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 @Service
 public class ICartServiceImpl implements ICartService {
@@ -58,5 +63,62 @@ public class ICartServiceImpl implements ICartService {
                 throw new UpdateException("数据更新失败！");
             }
         }
+    }
+
+    @Override
+    public List<CartVo> getVOByUid(Integer uid) {
+        List<CartVo> data = cartMapper.findVOByUid(uid);
+        return data;
+    }
+
+    @Override
+    public Integer addNum(Integer cid,Integer uid,String username) {
+        Cart cart = cartMapper.findByCid(cid);
+        if (cart == null) {
+            throw new CartNotFountException("该数据不存在！");
+        }
+        if (!uid.equals(cart.getUid())){
+            throw new AccessDeniedException("非法访问！");
+        }
+        Integer num = cart.getNum()+1;
+        Integer rows = cartMapper.updateCartByCid(cid, num, username, new Date());
+        if (rows != 1) {
+            throw new UpdateException("修改时出现未知异常！");
+        }
+        return num;
+    }
+
+    @Override
+    public Integer reduceNum(Integer cid, Integer uid, String username) {
+        Cart cart = cartMapper.findByCid(cid);
+        if (cart == null) {
+            throw new CartNotFountException("该数据不存在！");
+        }
+        if (!uid.equals(cart.getUid())){
+            throw new AccessDeniedException("非法访问！");
+        }
+        if (cart.getNum() < 1) {
+            throw new UpdateException("购物车数据不存在!");
+        }
+        Integer num = cart.getNum()-1;
+        Integer rows = cartMapper.updateCartByCid(cid, num, username, new Date());
+        if (rows != 1) {
+            throw new UpdateException("数据更新出现未知异常！");
+        }
+        return num;
+    }
+
+    @Override
+    public List<CartVo> getVOByCid(Integer uid, Integer[] cids) {
+        List<CartVo> list = cartMapper.findVOByCid(cids);
+        Iterator<CartVo> iterator = list.iterator();
+        while (iterator.hasNext()){
+            CartVo cartVo = iterator.next();
+            if (!cartVo.getUid().equals(uid)) {
+                //将不属于当前用户的购物车数据删除
+                list.remove(cartVo);
+            }
+        }
+        return list;
     }
 }

@@ -31,4 +31,27 @@
         SELECT * FROM t_cart
         WHERE uid = #{uid} AND pid = #{pid}
     </select>
+    <select id="findVOByUid" resultType="com.demo.shop.vo.CartVo">
+        select cid,uid,pid,
+               t_cart.price,t_cart.num,
+               t_product.title,t_product.image,t_product.price as realprice
+        from t_cart left join t_product on t_cart.pid = t_product.id
+        where uid = #{uid}
+        order by t_cart.modified_time DESC
+    </select>
+    <select id="findByCid" resultMap="CartEntityMap">
+        select * from t_cart where cid = #{cid}
+    </select>
+    <select id="findVOByCid" resultType="com.demo.shop.vo.CartVo">
+        select cid,uid,pid,
+               t_cart.price,t_cart.num,
+               t_product.title,t_product.image,t_product.price as realprice
+        from t_cart left join t_product on t_cart.pid = t_product.id
+        where cid in (
+                <foreach collection="array" item="cid" separator=",">
+                    #{cid}
+                </foreach>
+            )
+        order by t_cart.modified_time DESC
+    </select>
 </mapper>
