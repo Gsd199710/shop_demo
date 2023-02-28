@@ -137,6 +137,25 @@ public class AddressServiceImpl implements IAddressService {
     }
 
     @Override
+    public Address getByAid(Integer aid,Integer uid) {
+        Address address = addressMapper.findByAid(aid);
+        if (address == null) {
+            throw new AddressNotFoundException("该地址不存在！");
+        }
+        if (!address.getUid().equals(uid)){
+            throw new AccessDeniedException("非法访问！");
+        }
+        address.setModifiedUser(null);
+        address.setModifiedTime(null);
+        address.setCreatedUser(null);
+        address.setCreatedTime(null);
+        address.setProvinceCode(null);
+        address.setCityCode(null);
+        address.setAreaCode(null);
+        return address;
+    }
+
+    @Override
     public int getIsDefault(Integer aid) {
         return addressMapper.getIsDefaultByAid(aid);
     }

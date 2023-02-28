@@ -273,7 +273,7 @@
 							let tr = '<tr>'
 									+ '<td><img src="..#{image}collect.png" class="img-responsive" /></td>'
 									+ '<td><input type="hidden" name="cids" value="#{cid}" />#{title}</td>'
-									+ '<td>¥<span>#{realPrice}</span></td>'
+									+ '<td>¥<span>#{price}</span></td>'
 									+ '<td>#{num}</td>'
 									+ '<td>¥<span>#{totalPrice}</span></td>'
 								  + '</tr>';
@@ -281,21 +281,21 @@
 							tr = tr.replace(/#{cid}/g, list[i].cid);
 							tr = tr.replace(/#{image}/g, list[i].image);
 							tr = tr.replace(/#{title}/g, list[i].title);
-							tr = tr.replace(/#{realPrice}/g, list[i].realPrice);
+							tr = tr.replace(/#{price}/g, list[i].price);
 							tr = tr.replace(/#{num}/g, list[i].num);
-							tr = tr.replace(/#{totalPrice}/g, list[i].realPrice * list[i].num);
+							tr = tr.replace(/#{totalPrice}/g, list[i].price * list[i].num);
 
 							$("#cart-list").append(tr);
-
+						//更新总数和总价
 							allCount += list[i].num;
-							allPrice += list[i].realPrice * list[i].num;
+							allPrice += list[i].price * list[i].num;
 						}
 						$("#all-count").html(allCount);
 						$("#all-price").html(allPrice);
 					}
 				});
 			}
-
+			//收货地址列表
 			function showAddressList() {
 				$("#address-list").empty();
 				$.ajax({
@@ -323,7 +323,7 @@
 					}
 				});
 			}
-
+			//添加订单
 			$("#btn-create-order").click(function() {
 				$.ajax({
 					url: "/orders/create",
@@ -331,8 +331,9 @@
 					type: "POST",
 					dataType: "JSON",
 					success: function(json) {
-						if (json.state == 200) {
+						if (json.state == 101) {
 							alert("创建订单成功！");
+							location.href="payment.html";
 							console.log(json.data);
 						} else {
 							alert("创建订单失败！" + json.message);

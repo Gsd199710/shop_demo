@@ -33,4 +33,6 @@ public interface IAddressService {
      * @return 地址默认值
      */
     int getIsDefault(Integer aid);
+
+    Address getByAid(Integer aid,Integer uid);
 }
